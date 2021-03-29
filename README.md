@@ -1,7 +1,6 @@
-# parser in main.go
-
-- run the test query app
-- go run main.go
+# where condition parser
+- parser in main.go
+- run the test query app : go run main.go
 
 # func in app
 - Parse(query string, qb squirrel.SelectBuilder) (*squirrel.SelectBuilder, error)
