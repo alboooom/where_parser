@@ -5,12 +5,11 @@ import (
 	"github.com/Masterminds/squirrel"
 	"regexp"
 	"strings"
+	//"reflect"
 )
 
 
 func Find(cond string) (string, []string) {
-	// Тут пишем условия на все операторы
-	//fmt.Println(cond)
 	re := regexp.MustCompile("((<=)|(>=)|(!=)|(LIKE)|=|<|>)")
 	found := re.FindAllString(cond, 1)
 	if len(found) < 1{
@@ -26,9 +25,11 @@ func Find(cond string) (string, []string) {
 
 func splitCondition(query string) squirrel.Sqlizer {
 	exp, arr := Find(query)
+	//if !callBackHandler(arr[0], arr[1]){
+	//panic(fmt.Errorf("type mismatch"))
+	//}
 	switch exp {
 	case "=":
-		// Где-то тут нужен колбэк
 		return squirrel.Eq{arr[0]: arr[1]}
 	case "<=":
 		return squirrel.LtOrEq{arr[0]: arr[1]}
@@ -66,6 +67,16 @@ func checkAnotherOpers(query string) (flag bool) {
 	return
 }
 
+//func callBackHandler(name string, value string) bool{
+//	partsName := strings.Split(name,".")
+//	//nType = discover type of colomn partsName(len(partsName)-1)
+//	//compare the value type and the resulting name type
+//	if reflect.TypeOf(value) == nType{
+//		return true
+//	} else{
+//		return false
+//	}
+//}
 
 func Parse(query string, qb squirrel.SelectBuilder) (*squirrel.SelectBuilder, error){
 	if checkAnotherOpers(query){
