@@ -1,6 +1,6 @@
-# where_parser   
-- percer in main.go
-# Run the test query app
+# parser in main.go
+
+- run the test query app
 - go run main.go
 
 # func in app
