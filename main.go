@@ -10,7 +10,7 @@ import (
 
 
 func Find(cond string) (string, []string) {
-	re := regexp.MustCompile("((<=)|(>=)|(!=)|(LIKE)|=|<|>)")
+	re := regexp.MustCompile("((<=)|(>=)|(!=)|(!~)|(~)|=|<|>)")
 	found := re.FindAllString(cond, 1)
 	if len(found) < 1{
 		panic(fmt.Errorf("has not cond operator"))
@@ -23,8 +23,8 @@ func Find(cond string) (string, []string) {
 }
 
 
-func splitCondition(query string) squirrel.Sqlizer {
-	exp, arr := Find(query)
+func splitCondition(condition string) squirrel.Sqlizer {
+	exp, arr := Find(condition)
 	//if !callBackHandler(arr[0], arr[1]){
 	//panic(fmt.Errorf("type mismatch"))
 	//}
@@ -80,7 +80,7 @@ func checkAnotherOpers(query string) (flag bool) {
 
 func Parse(query string, qb squirrel.SelectBuilder) (*squirrel.SelectBuilder, error){
 	if checkAnotherOpers(query){
-		panic(fmt.Errorf("unacceptable opertor"))
+		return nil, fmt.Errorf("unacceptable opertor")
 	}
 	conditions := strings.Split(query, "OR")
 	baseCond := squirrel.Or{}
@@ -92,30 +92,17 @@ func Parse(query string, qb squirrel.SelectBuilder) (*squirrel.SelectBuilder, er
 			baseCond = append(baseCond, splitCondition(oneOrCond))
 		}
 	}
-	fmt.Println(baseCond.ToSql())
+	//fmt.Println(baseCond.ToSql())
 	result := qb.Where(baseCond)
 	return &result, nil
 }
 
 
-//func Parse(query string, qb squirrel.SelectBuilder) (*squirrel.SelectBuilder, error) {
-//	// Распаристь строку
-//	//
-//
-//	r := qb.Where(squirrel.And{squirrel.Eq{"test": 4}, squirrel.Or{squirrel.Eq{"test": 10}, squirrel.Gt{"test10": 20, "test123": 123}}})
-//	fmt.Println(r.ToSql())
-//	res := squirrel.Or{}
-//	r1 :=  squirrel.Or{squirrel.Eq{"test": 10}, squirrel.Gt{"test10": 20, "test123": 123}}
-//	r2 := squirrel.Or{squirrel.Eq{"wefwqe": 10}, squirrel.Gt{"wqer": 20}}
-//	res = append(res, r1, r2)
-//	fmt.Println(res.ToSql())
-//	return &r, nil
-//}
-
 func main()  {
 	qb := squirrel.SelectBuilder{}
 	a, err := Parse("test = 10 OR test10 > 20 AND test123 > 123 OR wefwqe = 10 OR wqer > 20", qb)
-	fmt.Println("Hello")
-	fmt.Println(a, err)
-
+	if err != nil {
+		panic(fmt.Errorf("some error in parsing"))
+	}
+	fmt.Println(a)
 }
